@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
 import csv
+from sklearn.decomposition import PCA
 
 
 
@@ -21,27 +22,14 @@ def pair(data, labels=None):
 				ax.hist(data[:, i])
 				ax.set_title(labels[i])
 			else:
-				X = np.arange(-25, 25, 0.01)
-				Y = np.arange(-25, 25, 0.01)
+				X = np.arange(-18, 18, 0.01)
+				Y = np.arange(-18, 18, 0.01)
 				X, Y = np.meshgrid(X, Y)
-				Z = gaussianMixture(X, Y, pi, centroids, covmat)
+				Z = gaussianMixture(X, Y, pi, centroids[:,(i,j)], covmat[:,(i,j)])
 				ax.contour(X, Y, Z)
-				ax.scatter(data[:, 0], data[:, 1], s=1, color='0.5')
+				ax.scatter(data[:, i], data[:, j], s=1, color='0.5')
 	return fig
 
-def pairs(data):
-#"Quick&dirty scatterplot matrix"
-    d = len(data)
-    fig, axes = plt.subplots(nrows=d, ncols=d, sharex='col', sharey='row')
-    for i in range(d):
-        for j in range(d):
-            ax = axes[i,j]
-            if i == j:
-                ax.text(0.5, 0.5, transform=ax.transAxes,
-                        horizontalalignment='center', verticalalignment='center',
-                        fontsize=16)
-            else:
-                ax.scatter(data[j], data[i], s=10)
 
 
 def multivariateGaussianMixture(pi, centroids, covmat, n_samples):
@@ -99,9 +87,9 @@ centroids = np.array([[0, 0, 0, 0, 0],
 
 covmat = np.tile([3, 4, 5, 3, 1], (7,1))
 
-sim_out = multivariateGaussianMixture(pi, centroids, covmat, n_samples = 50)
+sim_out = multivariateGaussianMixture(pi, centroids, covmat, n_samples = 100)
 
-pairs(sim_out)
+pair(sim_out)
 
 
 """
