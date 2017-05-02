@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
 import csv
 from sklearn.decomposition import PCA
+import GaussianMixture
 
 
 
@@ -116,11 +117,13 @@ covmat = np.array([[3, 4],
 					 [3, 4],
 					 [4, 13]])
 
+gm = GaussianMixture.GaussianMixture(pi, centroids, covmat)
+gm_sim = gm.simulate_gm(100)
+
 
 sim_out = multivariateGaussianMixture(pi, centroids, covmat, n_samples = 500)
 
-pair(sim_out)
-
+	pair(sim_out)
 
 X = np.arange(-25, 25, 0.01)
 Y = np.arange(-25, 25, 0.01)
