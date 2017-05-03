@@ -125,8 +125,8 @@ sim_out = multivariateGaussianMixture(pi, centroids, covmat, n_samples = 500)
 
 	pair(sim_out)
 
-X = np.arange(-25, 25, 0.01)
-Y = np.arange(-25, 25, 0.01)
+X = np.arange(-25, 25, 0.2)
+Y = np.arange(-25, 25, 0.2)
 X, Y = np.meshgrid(X, Y)
 Z = gaussianMixture(X, Y, pi, centroids, covmat)
 fig = plt.figure()
