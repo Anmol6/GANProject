@@ -19,17 +19,25 @@ class GaussianMixture(object):
 
 	def simulate_gm(self, n_samples):
 		"""
+		Simulate from a Gaussian mixture
 		:type n_samples: number of samples to draw
 		:return: simulation output
 		"""
+		# initialise counting params
 		K = len(self.pi)
 		D = self.centroids.shape[1]
 		N = n_samples
-		x_out = np.zeros([N,D])
 		pi_cum = np.cumsum(self.pi)
+
+		# initialize empty matrix
+		x_out = np.zeros([N, D])
+
+		# draw each sample from the mixture according
+		# to the first occurring instance where a uniform
+		# random draw is less that a given cumulative weight
 		for n in range(N):
-			u = np.random.uniform()
-			q = u < pi_cum
+			u = np.random.uniform() # draw uniform
+			q = u < pi_cum # is uniform draw < pi?
 			for j in range(K):
 				if q[j] == True:
 					x_out[n, :] = np.random.multivariate_normal(self.centroids[j], np.diag(self.covmat[j]))
@@ -44,7 +52,10 @@ class GaussianMixture(object):
 		:param X: matrix of data, n obs * k variables
 		:return: density of gaussian mixture
 		"""
+		# initialize count K
 		K = len(self.pi)
+
+		# iterate over a weighted sum of normal pdf's
 		mix = 0
 		for k in range(K):
 			mix = mix + self.pi[k] * mvnorm.pdf(X, self.centroids[k], np.diag(self.covmat[k]))
@@ -60,18 +71,35 @@ class GaussianMixture(object):
 		:return: na
 		"""
 		def mixture_pdf(X, Y, pi, centroids, covmat):
+			"""
+			Bivariate pdf of gaussian mixture
+			:param X: data vector for variable x
+			:param Y: data vector for variable y
+			:param pi: mixture parameter
+			:param centroids: means for multivariate normal
+			:param covmat: covariance matrix for multivariate normal
+			:return: pdf of MVN
+			"""
+			# initialize counting params
 			K = len(pi)
 			D = centroids.shape[1]
 			N = len(X)
+
+			# sum over weighted bivariate normal pdf's
 			mix = np.zeros([N, N])
 			for k in range(K):
 				mix = mix + pi[k] * mlab.bivariate_normal(X, Y, covmat[k, 0], covmat[k, 1], centroids[k, 0], centroids[k, 1], 1)
 			return mix
 
+		# create grid for 3D surface plot
 		X = np.arange(ranges[0], ranges[1], fineness)
 		Y = np.arange(ranges[0], ranges[1], fineness)
 		X, Y = np.meshgrid(X, Y)
+
+		# determine pdf over grid
 		Z = mixture_pdf(X, Y, self.pi, self.centroids, self.covmat)
+
+		# plot the 3D surface
 		fig = plt.figure()
 		ax = fig.gca(projection='3d')
 		surf = ax.plot_surface(X, Y, Z, cmap=plt.get_cmap("coolwarm"), linewidth=0,
@@ -99,28 +127,40 @@ class GaussianMixture(object):
 			:param covmat: covariance matrix for multivariate normal
 			:return: pdf of MVN
 			"""
+			# initialize counting params
 			K = len(pi)
 			D = centroids.shape[1]
 			N = len(X)
+
+			# weighted sum of bivariate normal pdf's
 			mix = np.zeros([N, N])
 			for k in range(K):
 				mix = mix + pi[k] * mlab.bivariate_normal(X, Y, covmat[k, 0], covmat[k, 1], centroids[k, 0], centroids[k, 1], 1)
 			return mix
 
+		# initialize number of variables
 		n_variables = data.shape[1]
+
+		# specify labels if any
 		if labels is None:
 			labels = ['var%d' % i for i in range(n_variables)]
+
+		# initialize plot and iterate over each variable.
+		# for each variable, perform a visualization over grid
 		fig = plt.figure()
 		for i in range(n_variables):
 			for j in range(n_variables):
+				# create sub-plots for a given variable
 				n_sub = i * n_variables + j + 1
 				ax = fig.add_subplot(n_variables, n_variables, n_sub)
 				ax.axes.get_xaxis().set_ticklabels([])
 				ax.axes.get_yaxis().set_ticklabels([])
 				if i == j:
+					# diagonal plots are histograms (i==j)
 					ax.hist(data[:, i])
 					ax.set_title(labels[i])
 				else:
+					# off-diagonal plots are scatter and contours
 					X = np.arange(ranges[0], ranges[1], 0.1)
 					Y = np.arange(ranges[0], ranges[1], 0.1)
 					X, Y = np.meshgrid(X, Y)
