@@ -1,9 +1,10 @@
 import numpy as np
 from GaussianMixture import GaussianMixture
-from scipy.stats import multivariate_normal as mvnorm
 
 
-
+# ********************************************
+# inpute parameters below
+# ********************************************
 pi = np.array([20, 34, 32, 45, 40, 29, 70])
 pi = pi/pi.sum()
 
@@ -15,8 +16,6 @@ centroids = np.array([[0, 0],
 					 [2, 2],
 					 [15, -1]])
 
-covmat = np.tile([3, 4], (7,1))
-
 covmat = np.array([[3, 4],
 					 [3, 2.5],
 					 [2, 3],
@@ -25,13 +24,29 @@ covmat = np.array([[3, 4],
 					 [3, 4],
 					 [4, 13]])
 
-X = np.arange(-25, 25, 0.5)
-Y = np.arange(-25, 25, 0.5)
-X,Y = np.meshgrid(X, Y)
-grid = np.stack([X,Y])
-
+# ********************************************
+# Initialize GaussianMixture class
+# ********************************************
 gm = GaussianMixture(pi, centroids, covmat)
-gm_sim = gm.simulate_gm(100)
-pdf = gm.pdf_gm(gm_sim[1,:])
-#gm.pairs_gm(gm_sim)
-gm.surface_gm([-25,25], 0.5, filename="testplot.png")
+
+# ********************************************
+# Simulate from Gaussian mixture
+# ********************************************
+gm_sim = gm.simulate_gm(n_samples=100)
+
+# ********************************************
+# Obtain pdf of mixture for some input X
+# ********************************************
+pdf = gm.pdf_gm(gm_sim)
+
+
+# ********************************************
+# Visualize pdf of mixture in bivariate case
+# ********************************************
+gm.surface_gm(ranges=[-25,25], fineness=.5, filename="surfacelot.png")
+
+
+# ********************************************
+# Visualize pdf of mixture in bivariate case
+# ********************************************
+gm.pairs_gm(gm_sim, filename="pairsplot.png", ranges=[-25,25])
